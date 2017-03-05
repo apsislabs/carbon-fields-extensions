@@ -10,8 +10,13 @@ class Number_Field extends Field
 {
     protected $min;
     protected $max;
-    protected $step;
+	protected $step;
     protected $pattern;
+
+	public static function admin_enqueue_scripts() {
+        $dir = plugin_dir_url( __FILE__ );
+        wp_enqueue_script( 'carbon-field-Number_Field', $dir . 'field.js', array( 'carbon-fields' ) );
+    }
 
     /**
     * Returns an array that holds the field data, suitable for JSON representation.
@@ -27,6 +32,7 @@ class Number_Field extends Field
         return array_merge($field_data, array(
             'min' => $this->min,
             'max' => $this->max,
+            'step' => $this->step ? $this->step : 'any',
             'pattern' => $this->pattern
         ));
     }
@@ -84,21 +90,8 @@ class Number_Field extends Field
      **/
     public function set_step($step)
     {
-        $this->step = $this->parse_numeric($step, "set_step");
+        $this->step(floatval($step));
         return $this;
-    }
-
-    public function save()
-    {
-        $value = $this->get_value();
-
-        if ( isset($value) && $value !== '' && is_numeric($value) ) {
-            if ( $this->valid_value($number) ) {
-                $this->set_value($value);
-            }
-        }
-
-        parent::save();
     }
 
     /**
@@ -107,7 +100,7 @@ class Number_Field extends Field
     public function template()
     {
         ?>
-            <input id="{{{ id }}}" type="number" name="{{{ name }}}" value="{{ value }}" min="{{ min }}" max="{{ max }}" pattern="{{ pattern }}" class="regular-text" />
+            <input id="{{{ id }}}" type="number" name="{{{ name }}}" value="{{ value }}" min="{{ min }}" step="{{ step }}" max="{{ max }}" pattern="{{ pattern }}" class="regular-text number-field" />
         <?php
 
     }
@@ -118,7 +111,7 @@ class Number_Field extends Field
     private function parse_numeric($number, $field_name)
     {
         if (is_numeric($number)) {
-            return floatval($number);
+            return intval($number);
         } else {
             Incorrect_Syntax_Exception::raise("Only numeric values are allowed in the <code>$field_name()</code> method.");
         }
@@ -136,8 +129,15 @@ class Number_Field extends Field
     {
         $valid_min  = ($value >= $this->min);
         $valid_max  = ($value <= $this->max);
-        $valid_step = (( $value - $this->min ) / $this->step);
 
-        return ( $valid_min && $valid_max && ($valid_step === floor($valid_step)) );
+        if ( $this->step > 0 ) {
+            $valid_step = (( $value - $this->min ) / $this->step);
+
+            if ($valid_step === floor($valid_step)) {
+                return false;
+            }
+        }
+
+        return ( $valid_min && $valid_max );
     }
 }

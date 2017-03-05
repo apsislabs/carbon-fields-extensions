@@ -20,7 +20,7 @@ class CarbonFieldsExtensions
     public static function addActions()
     {
         add_action('admin_enqueue_scripts',  array(static::class, 'loadAdminAssets'));
-        add_action('admin_footer', array( static::class, 'adminHookScripts' ), 5 );
+		add_action( 'admin_footer', array( static::class, 'adminHookScripts' ), 5 );
     }
 
     public static function loadAdminAssets()
@@ -47,7 +47,9 @@ class CarbonFieldsExtensions
 
     public static function adminHookScripts()
     {
-        wp_localize_script( 'cfe_l10n', 'cfel10n',
+        wp_enqueue_script( 'carbon-fields-extensions', dirname(__FILE__) . '/assets/js/cfe.js', array( 'carbon-app', 'carbon-containers' ) );
+
+        wp_localize_script( 'carbon-fields-extensions', 'cfel10n',
             array(
                 'message_validation_failed_invalid_url' => __( 'Please enter a valid URL.', 'carbon-fields-extensions' ),
                 'message_validation_failed_number_min'  => __( 'Value must be greater than or equal to %s.', 'carbon-fields-extensions' ),
