@@ -20,6 +20,7 @@ class CarbonFieldsExtensions
     public static function addActions()
     {
         add_action('admin_enqueue_scripts',  array(static::class, 'loadAdminAssets'));
+        add_action('admin_footer', array( static::class, 'admin_hook_scripts' ), 5 );
     }
 
     public static function loadAdminAssets()
@@ -42,6 +43,18 @@ class CarbonFieldsExtensions
                 static::require_all($path, $depth+1);
             }
         }
+    }
+
+    protected static function adminHookScripts()
+    {
+        wp_localize_script( 'cfe_l10n', 'cfel10n',
+            array(
+                'message_validation_failed_invalid_url' => __( 'Please enter a valid URL.', 'carbon-fields-extensions' ),
+                'message_validation_failed_number_min'  => __( 'Value must be greater than or equal to %s.', 'carbon-fields-extensions' ),
+                'message_validation_failed_number_max'  => __( 'Value must be less than or equal to %s.', 'carbon-fields-extensions' ),
+                'message_validation_failed_number_step' => __( 'Please enter a valid value. The two nearest valid values are %1$s and %2$s.', 'carbon-fields-extensions' )
+            )
+        );
     }
 }
 

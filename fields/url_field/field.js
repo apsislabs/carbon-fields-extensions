@@ -11,7 +11,7 @@ window.carbon = window.carbon || {};
             }
 
             if (!this.checkUrl(attrs.value)) {
-                return "Please enter a valid URL."
+                return cfel10n.message_validation_failed_invalid_url;
             }
         },
 

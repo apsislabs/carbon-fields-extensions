@@ -10,7 +10,7 @@ class Number_Field extends Field
 {
     protected $min;
     protected $max;
-	protected $step;
+    protected $step;
     protected $pattern;
 
     /**
@@ -84,8 +84,21 @@ class Number_Field extends Field
      **/
     public function set_step($step)
     {
-        $this->step(floatval($step));
+        $this->step = $this->parse_numeric($step, "set_step");
         return $this;
+    }
+
+    public function save()
+    {
+        $value = $this->get_value();
+
+        if ( isset($value) && $value !== '' && is_numeric($value) ) {
+            if ( $this->valid_value($number) ) {
+                $this->set_value($value);
+            }
+        }
+
+        parent::save();
     }
 
     /**
@@ -105,9 +118,26 @@ class Number_Field extends Field
     private function parse_numeric($number, $field_name)
     {
         if (is_numeric($number)) {
-            return intval($number);
+            return floatval($number);
         } else {
             Incorrect_Syntax_Exception::raise("Only numeric values are allowed in the <code>$field_name()</code> method.");
         }
+    }
+
+    /**
+     * Check if number is between min and max, and is a valid step.
+     * We need to validate if the number, minus the minimum value,
+     * divided by the step is a whole number.
+     *
+     * @param  int|float $number    number to validate
+     * @return bool                 whether the number is valid
+     */
+    private function valid_value($number)
+    {
+        $valid_min  = ($value >= $this->min);
+        $valid_max  = ($value <= $this->max);
+        $valid_step = (( $value - $this->min ) / $this->step);
+
+        return ( $valid_min && $valid_max && ($valid_step === floor($valid_step)) );
     }
 }
