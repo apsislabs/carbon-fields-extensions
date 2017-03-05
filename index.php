@@ -20,7 +20,7 @@ class CarbonFieldsExtensions
     public static function addActions()
     {
         add_action('admin_enqueue_scripts',  array(static::class, 'loadAdminAssets'));
-        add_action('admin_footer', array( static::class, 'admin_hook_scripts' ), 5 );
+        add_action('admin_footer', array( static::class, 'adminHookScripts' ), 5 );
     }
 
     public static function loadAdminAssets()
