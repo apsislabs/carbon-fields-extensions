@@ -45,7 +45,7 @@ class CarbonFieldsExtensions
         }
     }
 
-    private static function adminHookScripts()
+    public static function adminHookScripts()
     {
         wp_localize_script( 'cfe_l10n', 'cfel10n',
             array(
