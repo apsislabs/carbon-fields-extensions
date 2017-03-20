@@ -12,15 +12,19 @@ class CarbonFieldsExtensions
 {
     public static function init()
     {
-        $dir = dirname(__FILE__);
-        static::require_all("$dir/fields");
-        static::addActions();
+        add_action('admin_enqueue_scripts',  array(static::class, 'loadAdminAssets'));
+        add_action('admin_footer', array( static::class, 'adminHookScripts' ), 5);
+        add_action('after_setup_theme', array(static::class, 'includeFieldDefinitions'), 15);
+
     }
 
-    public static function addActions()
+    public static function includeFieldDefinitions()
     {
-        add_action('admin_enqueue_scripts',  array(static::class, 'loadAdminAssets'));
-		add_action( 'admin_footer', array( static::class, 'adminHookScripts' ), 5 );
+        $dir = dirname(__FILE__);
+
+        if ( class_exists( 'Carbon_Fields\\Field\\Field' ) ) {
+            static::require_all("$dir/fields");
+        }
     }
 
     public static function loadAdminAssets()
