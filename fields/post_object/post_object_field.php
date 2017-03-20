@@ -8,9 +8,7 @@ class Post_Object_Field extends Grouped_Select_Field
 
     public static function admin_enqueue_scripts() {
         $dir = plugin_dir_url( __FILE__ );
-
-		wp_enqueue_style( 'chosen_styles' );
-
+        wp_enqueue_style( 'chosen_styles' );
         wp_enqueue_script( 'chosen' );
         wp_enqueue_script( 'carbon-field-Post_Object_Field', $dir . '/field.js', array( 'carbon-fields', 'jquery', 'chosen' ) );
     }
@@ -26,24 +24,9 @@ class Post_Object_Field extends Grouped_Select_Field
             $post_type = array( $post_type );
         }
 
-        if ( $this->valid_post_type_array($post_type) ) {
-            $this->post_type = $post_type;
-        } else {
-            Incorrect_Syntax_Exception::raise('Only valid post types are allowed in the <code>set_post_type()</code> method.');
-        }
+        $this->post_type = $post_type;
 
         return $this;
-    }
-
-    public function valid_post_type_array($post_types)
-    {
-        foreach ($post_types as $post_type) {
-            if (!post_type_exists($post_type)) {
-                return false;
-            }
-        }
-
-        return true;
     }
 
     /**
@@ -55,7 +38,11 @@ class Post_Object_Field extends Grouped_Select_Field
         $options = array();
 
         foreach ( $this->post_type as $post_type ) {
-            $options = array_merge( $options, $this->options_for_post_type($post_type) );
+            if (post_type_exists($post_type)) {
+                $options = array_merge( $options, $this->options_for_post_type($post_type) );
+            } else {
+                Incorrect_Syntax_Exception::raise('Only valid post types are allowed in the <code>set_post_type()</code> method.');
+            }
         }
 
         $this->options = $options;
