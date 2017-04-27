@@ -1,5 +1,6 @@
 <?php
 namespace Carbon_Fields\Field;
+
 use Carbon_Fields\Exception\Incorrect_Syntax_Exception;
 
 /**
@@ -7,13 +8,21 @@ use Carbon_Fields\Exception\Incorrect_Syntax_Exception;
  */
 class Grouped_Select_Field extends Select_Field
 {
-    public static function admin_enqueue_scripts() {
-        $dir = plugin_dir_url( __FILE__ );
+    protected $allow_blank = true;
 
-        wp_enqueue_style( 'chosen_styles' );
+    public static function admin_enqueue_scripts()
+    {
+        $dir = plugin_dir_url(__FILE__);
 
-        wp_enqueue_script( 'chosen' );
-        wp_enqueue_script( 'carbon-field-Grouped_Select_Field', $dir . '/field.js', array( 'carbon-fields', 'jquery', 'chosen' ) );
+        wp_enqueue_style('chosen_styles');
+        wp_enqueue_script('chosen');
+        wp_enqueue_script('carbon-field-Grouped_Select_Field', $dir . '/field.js', array( 'carbon-fields', 'jquery', 'chosen' ));
+    }
+
+    public function allow_blank($allow)
+    {
+        $this->allow_blank = !!$allow;
+        return $this;
     }
 
     /**
@@ -23,20 +32,20 @@ class Grouped_Select_Field extends Select_Field
      * @param array|callable $options
      * @return array
      */
-    public function parse_options( $options )
+    public function parse_options($options)
     {
         $parsed = array();
 
-        if ( is_callable( $options ) ) {
-            $options = call_user_func( $options );
+        if (is_callable($options)) {
+            $options = call_user_func($options);
         }
 
         // Check if we need to format with optgroups
         $optgroup = $this->needs_optgroup($options);
 
-        if ( $optgroup ) {
+        if ($optgroup) {
             // Parse into option groups
-            foreach ( $options as $key => $value ) {
+            foreach ($options as $key => $value) {
                 $parsed[] = array(
                     'group' => $key,
                     'options' => $this->format_options($value)
@@ -44,7 +53,7 @@ class Grouped_Select_Field extends Select_Field
             }
         } else {
             // Parse as normal select
-            foreach ( $options as $key => $value ) {
+            foreach ($options as $key => $value) {
                 $parsed[] = $this->format_option($key, $value);
             }
         }
@@ -57,12 +66,14 @@ class Grouped_Select_Field extends Select_Field
      */
     public function load_options()
     {
-        if ( empty( $this->options ) ) { return false; }
+        if (empty($this->options)) {
+            return false;
+        }
 
-        if ( is_callable( $this->options ) ) {
-            $options = call_user_func( $this->options );
+        if (is_callable($this->options)) {
+            $options = call_user_func($this->options);
 
-            if ( ! is_array( $options ) ) {
+            if (! is_array($options)) {
                 $options = array();
             }
 
@@ -78,7 +89,7 @@ class Grouped_Select_Field extends Select_Field
      */
     public function add_options($options)
     {
-        if ( is_array($options) ) {
+        if (is_array($options)) {
             $this->options = array_merge($this->options, $options);
         } else {
             Incorrect_Syntax_Exception::raise('Only arrays are allowed in the <code>add_options()</code> method.');
@@ -96,9 +107,9 @@ class Grouped_Select_Field extends Select_Field
      */
     private function needs_optgroup($options)
     {
-        if ( is_array($options) ) {
+        if (is_array($options)) {
             foreach ($options as $key => $value) {
-                if ( is_array($value) ) {
+                if (is_array($value)) {
                     return true;
                 }
             }
@@ -118,7 +129,7 @@ class Grouped_Select_Field extends Select_Field
     {
         $formatted = array();
 
-        foreach ( $options as $key => $value ) {
+        foreach ($options as $key => $value) {
             $formatted[] = $this->format_option($key, $value);
         }
 
@@ -138,14 +149,35 @@ class Grouped_Select_Field extends Select_Field
     }
 
     /**
+     * Returns an array that holds the field data, suitable for JSON representation.
+     * This data will be available in the Underscore template and the Backbone Model.
+     *
+     * @param bool $load  Should the value be loaded from the database or use the value from the current instance.
+     * @return array
+     */
+    public function to_json($load)
+    {
+        $field_data = parent::to_json($load);
+        $field_data = array_merge($field_data, array(
+            'allowBlank' => $this->allow_blank,
+        ));
+        return $field_data;
+    }
+
+    /**
      * The main Underscore template of this field.
      */
-    public function template() {
+    public function template()
+    {
         ?>
         <# if (_.isEmpty(options)) { #>
-            <em><?php _e( 'no options', 'carbon-fields' ); ?></em>
+            <em><?php _e('no options', 'carbon-fields'); ?></em>
         <# } else { #>
             <select id="{{{ id }}}" name="{{{ name }}}">
+                <# if ( allowBlank ) { #>
+                    <option value=""></option>
+                <# } #>
+
                 <# _.each(options, function(opt) { #>
                     <# if (_.has(opt, 'group')) { #>
                         <optgroup label="{{{ opt.group }}}">
@@ -164,5 +196,6 @@ class Grouped_Select_Field extends Select_Field
             </select>
         <# } #>
         <?php
+
     }
 }

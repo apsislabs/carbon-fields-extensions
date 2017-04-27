@@ -13,6 +13,7 @@ window.carbon = window.carbon || {};
         initChosen: function() {
             $(this.el).find('select').chosen({
                 search_contains: true,
+                allow_single_deselect: true,
                 width: "100%"
             });
         }
