@@ -51,7 +51,7 @@ class CarbonFieldsExtensions
 
     public static function adminHookScripts()
     {
-        wp_enqueue_script( 'carbon-fields-extensions', dirname(__FILE__) . '/assets/js/cfe.js', array( 'carbon-app', 'carbon-containers' ) );
+        wp_enqueue_script( 'carbon-fields-extensions', plugins_url( '/assets/js/cfe.js', __FILE__), array( 'carbon-app', 'carbon-containers' ) );
 
         wp_localize_script( 'carbon-fields-extensions', 'cfel10n',
             array(
