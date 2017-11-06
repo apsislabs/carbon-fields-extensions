@@ -36,7 +36,7 @@ class CarbonFieldsExtensions
         wp_register_script( 'chosen', plugins_url( '/assets/vendor/chosen/chosen.jquery.min.js', __FILE__ ), array('jquery'));
     }
 
-    protected static function require_all($dir) {
+    protected static function require_all($dir, $depth = 0) {
         $scan = glob("$dir/*");
 
         foreach ($scan as $path) {

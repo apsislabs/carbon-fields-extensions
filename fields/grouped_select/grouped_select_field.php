@@ -9,6 +9,7 @@ use Carbon_Fields\Exception\Incorrect_Syntax_Exception;
 class Grouped_Select_Field extends Select_Field
 {
     protected $allow_blank = true;
+    protected $options = array();
 
     public static function admin_enqueue_scripts()
     {
@@ -52,9 +53,11 @@ class Grouped_Select_Field extends Select_Field
                 );
             }
         } else {
-            // Parse as normal select
-            foreach ($options as $key => $value) {
-                $parsed[] = $this->format_option($key, $value);
+            if ( is_array( $options ) && $options instanceof Traversable) {
+                // Parse as normal select
+                foreach ($options as $key => $value) {
+                    $parsed[] = $this->format_option($key, $value);
+                }
             }
         }
 
