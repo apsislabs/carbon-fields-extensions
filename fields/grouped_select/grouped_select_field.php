@@ -67,7 +67,7 @@ class Grouped_Select_Field extends Select_Field
     /**
      * Loads options for parsing by parse_options()
      */
-    public function load_options()
+    protected function load_options()
     {
         if (empty($this->options)) {
             return false;
@@ -82,6 +82,8 @@ class Grouped_Select_Field extends Select_Field
 
             $this->options = $options;
         }
+
+        return $this->options;
     }
 
     /**
@@ -161,9 +163,11 @@ class Grouped_Select_Field extends Select_Field
     public function to_json($load)
     {
         $field_data = parent::to_json($load);
+
         $field_data = array_merge($field_data, array(
             'allowBlank' => $this->allow_blank,
         ));
+
         return $field_data;
     }
 

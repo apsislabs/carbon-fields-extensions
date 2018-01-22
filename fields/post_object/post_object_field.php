@@ -46,6 +46,8 @@ class Post_Object_Field extends Grouped_Select_Field
         }
 
         $this->options = $options;
+
+        return $this->options;
     }
 
     /**
