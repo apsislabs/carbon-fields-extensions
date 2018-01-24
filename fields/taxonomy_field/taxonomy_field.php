@@ -62,7 +62,7 @@ class Taxonomy_Field extends Grouped_Select_Field
             Incorrect_Syntax_Exception::raise('Only valid taxonomies are allowed in the <code>set_taxonomy()</code> method.');
         }
 
-        return $this;
+        return $this->options;
     }
 
     private function values_for_taxonomy($taxonomy)
